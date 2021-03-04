@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"editor.tabSize": 8,
+		"editor.detectIndentation": false,
+		"editor.insertSpaces": false
+	}
+}

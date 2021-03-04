@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.10)
+
+set(FRANKENTAR_SOURCES
+	${CMAKE_CURRENT_LIST_DIR}/read.c
+	${CMAKE_CURRENT_LIST_DIR}/write.c
+PARENT_SCOPE)
