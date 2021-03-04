@@ -7,6 +7,11 @@
 	"settings": {
 		"editor.tabSize": 8,
 		"editor.detectIndentation": false,
-		"editor.insertSpaces": false
+		"editor.insertSpaces": false,
+		"files.associations": {
+			"util.h": "c",
+			"stdlib.h": "c",
+			"stb_sprintf.h": "c"
+		}
 	}
 }

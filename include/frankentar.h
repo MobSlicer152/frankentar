@@ -42,6 +42,18 @@ extern "C" {
  */
 #define FTAR_BLOCK_SIZE 512
 
+#define FTAR_MODE_EXEC (1) /** Executable */
+#define FTAR_MODE_WRITE (1 << 1) /** Readable */
+#define FTAR_MODE_READ (1 << 2) /** Writable */
+#define FTAR_MODE_RDWR (FTAR_MODE_READ | FTAR_MODE_WRITE) /** Read-write */
+#define FTAR_MODE_RDEX (FTAR_MODE_READ | FTAR_MODE_EXEC) /** Read-exec */
+#define FTAR_MODE_FULL \
+	(FTAR_MODE_READ | FTAR_MODE_WRITE | FTAR_MODE_EXEC) /** Full access */
+
+#define FTAR_MODE_USER(mode) ((mode) << 6)
+#define FTAR_MODE_GROUP(mode) ((mode) << 3)
+#define FTAR_MODE_OTHERS(mode) (mode)
+
 /**
  * @brief A Frankentar entry (pretty much the same as tar but some fields are
  *  size_t instead of `char` arrays, since only LE will be dealt with, and
