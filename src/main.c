@@ -8,6 +8,11 @@
 #include "frankentar/read.h"
 #include "frankentar/write.h"
 
+#define FTAR_OP_READ_STR "read"
+#define FTAR_OP_LIST_STR "list"
+#define FTAR_OP_FIND_STR "find"
+#define FTAR_OP_READ 0
+
 int main(int argc, char *argv[])
 {
 	struct ftar *ar;
