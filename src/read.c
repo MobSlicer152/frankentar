@@ -137,6 +137,59 @@ struct ftar_ent *ftar_find(struct ftar *tar, long *index, const char *name, ...)
 	return ent;
 }
 
+long ftar_checksum(struct ftar_ent *ent)
+{
+	long ret;
+	size_t i;
+
+	/* Validate our parameter */
+	if (!ent) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	/* Calculate the sum */
+	for (i = 0; i < strlen(ent->name); i++)
+		ret += (unsigned char)ent->name[i];
+	ret += (ent->mode + ent->size + ent->mtime);
+	ret += (' ' * 8); /*
+			   * According to the tar spec, ent->checksum should be
+			   *  treated as spaces for this calculation
+			   */
+
+	/* Check if we're validating the checksum or just calculating it */
+	if (ent->checksum)
+		ret = (ret == ent->checksum) ? 1 : 0;
+	else
+		ent->checksum = ret;
+
+	return ret;
+}
+
+void ftar_free(struct ftar *tar)
+{
+	size_t i;
+
+	errno = 0;
+
+	/* Avoid a segfault */
+	if (!tar) {
+		errno = EINVAL;
+		return;
+	}
+
+	/* Free the entries */
+	for (i = 0; i < tar->ent_count; i++) {
+		if (tar->entries[i])
+			free(tar->entries[i]);
+	}
+
+	/* Free the structure */
+	free(tar);
+
+	errno = 0;
+}
+
 #ifdef __cplusplus
 }
 #endif

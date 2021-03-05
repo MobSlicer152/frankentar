@@ -17,13 +17,16 @@ int main(int argc, char *argv[])
 {
 	struct ftar *ar;
 	struct ftar_ent *asdf;
+	struct ftar_ent *found;
 	char *tar;
 	size_t len;
 	size_t i;
+	long idx;
+	struct tm *now;
 
 	/* Allocate a buffer */
-	len = FTAR_MAGIC_LEN + (sizeof(struct ftar_ent) - sizeof(char *)) + 5 +
-	      FTAR_BLOCK_SIZE * 2;
+	len = FTAR_MAGIC_LEN + (sizeof(struct ftar_ent) - sizeof(char *)) + 5 + /* 5 is to be the length of the file */
+	      FTAR_BLOCK_SIZE * 2; /* The last two 512-byte blocks have to be NULL */
 	tar = calloc(len, sizeof(char));
 	if (!tar) {
 		fprintf(stderr, "Error: failed to allocate buffer: %s\n",
@@ -41,20 +44,12 @@ int main(int argc, char *argv[])
 
 	/* Fill in the entry */
 	sprintf(asdf->name, "test.txt"); /* The file will be called test.txt */
-	asdf->mode = FTAR_MODE_USER(FTAR_MODE_FULL) |
-		     FTAR_MODE_GROUP(FTAR_MODE_RDWR) |
-		     FTAR_MODE_OTHERS(FTAR_MODE_RDWR);
+	asdf->mode = FTAR_SET_MODE_USER(FTAR_MODE_FULL) |
+		     FTAR_SET_MODE_GROUP(FTAR_MODE_RDWR) |
+		     FTAR_SET_MODE_OTHERS(FTAR_MODE_RDWR);
 	asdf->size = 5;
 	asdf->mtime = time(NULL);
-
-	/* Checksum */
-	asdf->checksum = 0;
-	for (i = 0; i < strlen(asdf->name); i++)
-		asdf->checksum += (unsigned char)asdf->name[i];
-	asdf->checksum += asdf->mode + asdf->size + asdf->mtime;
-	asdf->checksum += ' ' * 8;
-
-	/* And the rest of the structure (link is already zero) */
+	asdf->checksum = ftar_checksum(asdf);
 	asdf->type = 0; /* Regular file */
 	asdf->data = calloc(asdf->size, sizeof(char));
 	if (!asdf->data) {
@@ -81,20 +76,33 @@ int main(int argc, char *argv[])
 		return errno;
 	}
 
-	/* Print the entries */
-	printf("Magic signature: %s\nNumber of entries: %zu\n", ar->magic,
-	       ar->ent_count);
-	for (i = 0; i < ar->ent_count; i++) {
-		printf("\nEntry %zu\nName: %s\nMode: %o\nSize: %zu\n"
-		       "Modification time: %lu\nChecksum: %zu\n",
-		       i, ar->entries[i]->name, ar->entries[i]->mode,
-		       ar->entries[i]->size, ar->entries[i]->mtime,
-		       ar->entries[i]->checksum);
-		printf("File type: %d\nLink name: %s\nFile contents: ",
-		       ar->entries[i]->type, ar->entries[i]->link);
-		fwrite(ar->entries[i]->data, ar->entries[i]->size, 1, stdout);
-		printf("\n");
+	/* Find our entry */
+	found = ftar_find(ar, &idx, "test.txt");
+	if (!found) {
+		fprintf(stderr, "Error: couldn't find entry: %s\n", strerror(errno));
+		return errno;
 	}
+
+	/* Turn the modification time of the entry into a string */
+	now = localtime(&asdf->mtime);
+
+	/* Print the entry we found */
+	printf("Index of found entry: %zu\nName: %s\nMode: %o\nSize: %zu\n"
+	       "Modification time: %d:%d:%d %d/%d/%d\nChecksum: %zu\n",
+	       idx, ar->entries[idx]->name, ar->entries[idx]->mode,
+	       ar->entries[idx]->size, now->tm_hour, now->tm_min,
+	       now->tm_sec, now->tm_mday, now->tm_mon + 1, now->tm_year - 70,
+	       ar->entries[idx]->checksum);
+	printf("File type: %d\nLink name: %s\nFile contents: ",
+	       ar->entries[idx]->type, ar->entries[idx]->link);
+	fwrite(ar->entries[idx]->data, ar->entries[idx]->size, 1, stdout);
+	
+	/* If necessary, write a newline */
+	if (ar->entries[idx]->data[ar->entries[idx]->size - 1] != '\n')
+		printf("\n");
+
+	/* Free the ~240/entry (sorry!) bytes used by the structure */
+	ftar_free(ar);
 
 	return 0;
 }

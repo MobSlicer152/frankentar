@@ -50,9 +50,13 @@ extern "C" {
 #define FTAR_MODE_FULL \
 	(FTAR_MODE_READ | FTAR_MODE_WRITE | FTAR_MODE_EXEC) /** Full access */
 
-#define FTAR_MODE_USER(mode) ((mode) << 6)
-#define FTAR_MODE_GROUP(mode) ((mode) << 3)
-#define FTAR_MODE_OTHERS(mode) (mode)
+#define FTAR_SET_MODE_USER(mode) ((mode) << 6)
+#define FTAR_SET_MODE_GROUP(mode) ((mode) << 3)
+#define FTAR_SET_MODE_OTHERS(mode) (mode)
+
+#define FTAR_GET_MODE_USER(mode) ((mode & 0b111000000) >> 6)
+#define FTAR_GET_MODE_GROUP(mode) ((mode & 0b111000) >> 3)
+#define FTAR_GET_MODE_OTHERS(mode) ((mode & 0b111))
 
 /**
  * @brief A Frankentar entry (pretty much the same as tar but some fields are
@@ -64,10 +68,10 @@ struct ftar_ent {
 	short mode; /**< File mode */
 	size_t size; /**< File size in bytes */
 	long mtime; /**< Last modification time */
-	size_t checksum; /**< Checksum of above values */
+	long checksum; /**< Checksum of above values */
 	char type; /**< File type flag */
 	char link[100]; /**< Link name */
-	char *data; /**< The file itself (comes after the entry metadata) */
+	char *data; /**< The file itself (obviously not stored as a pointer) */
 };
 
 struct ftar {

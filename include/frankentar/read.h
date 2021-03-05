@@ -51,6 +51,25 @@ extern struct ftar *ftar_load(void *tar, size_t tar_len);
  */
 extern struct ftar_ent *ftar_find(struct ftar *tar, long *index, const char *name, ...);
 
+/**
+ * @brief Gets the checksum for a given entry.
+ * 
+ * @param ent is the entry to checksum.
+ *
+ * @return Returns the checksum for the entry, or, in the event
+ *  that the entry's structure has its `checksum` field filled in,
+ *  1 or 0 to state whether the checksums match. If `ent` is NULL,
+ *  returns -1.
+ */
+extern long ftar_checksum(struct ftar_ent *ent);
+
+/**
+ * @brief Free a Frankentar structure
+ *
+ * @param tar is the Frankentar structure to free
+ */
+extern void ftar_free(struct ftar *tar);
+
 #ifdef __cplusplus
 }
 #endif
