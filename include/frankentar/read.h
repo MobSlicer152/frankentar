@@ -18,10 +18,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <errno.h>
 
 #include "frankentar.h"
+#include "util.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,12 +43,13 @@ extern struct ftar *ftar_load(void *tar, size_t tar_len);
  * @brief Find an entry with the given name in `tar`
  * 
  * @param tar is the Frankentar archive structure to search
+ * @param index is, if non-`NULL`, the index of the file if located
  * @param name is the name of the file to locate
  * 
  * @return Returns a Frankentar entry or `NULL` depending on whether the entry
  *  could be found
  */
-extern struct ftar_ent *ftar_find(struct ftar *tar, const char *name, ...);
+extern struct ftar_ent *ftar_find(struct ftar *tar, long *index, const char *name, ...);
 
 #ifdef __cplusplus
 }

@@ -88,9 +88,53 @@ struct ftar *ftar_load(void *tar, size_t tar_len)
 	return new;
 }
 
-struct ftar_ent *ftar_find(struct ftar *tar, const char *name, ...)
+struct ftar_ent *ftar_find(struct ftar *tar, long *index, const char *name, ...)
 {
-	
+	size_t name_len;
+	char *name_fmt;
+	struct ftar_ent *ent;
+	size_t i;
+	va_list args;
+
+	errno = 0;
+
+	/* Check parameters */
+	if (!tar || !name) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	/* Format name */
+	va_start(args, name);
+	name_fmt = fmt_text_va(&name_len, name, args);
+	va_end(args);
+
+	/* Loop through entries */
+	for (i = 0; i < tar->ent_count; i++) {
+		/* Check if the name matches */
+		if (strcmp(tar->entries[i]->name, name_fmt) == 0) {
+			ent = tar->entries[i];
+			break;
+		}
+	}
+
+	/* Check if we failed to find name in the archive */
+	if (!ent) {
+		errno = ENOENT;
+		if (index)
+			*index = -1;
+		return NULL;
+	}
+
+	/* Free name_fmt */
+	(name_len) ? (void)0 : free(name_fmt);
+
+	errno = 0;
+
+	/* Return ent, and if it's requested, index too */
+	if (index)
+		*index = i;
+	return ent;
 }
 
 #ifdef __cplusplus
