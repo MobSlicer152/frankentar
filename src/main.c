@@ -36,7 +36,9 @@ int main(int argc, char *argv[])
 
 	/* Fill in the entry */
 	sprintf(asdf->name, "test.txt"); /* The file will be called test.txt */
-	asdf->mode = 755;
+	asdf->mode = FTAR_MODE_USER(FTAR_MODE_FULL) |
+		     FTAR_MODE_GROUP(FTAR_MODE_RDWR) |
+		     FTAR_MODE_OTHERS(FTAR_MODE_RDWR);
 	asdf->size = 5;
 	asdf->mtime = time(NULL);
 
@@ -65,10 +67,6 @@ int main(int argc, char *argv[])
 		       (sizeof(struct ftar_ent) - sizeof(char *)),
 	       asdf->data, asdf->size);
 
-	/* Write the buffer to stdout */
-	fwrite(tar, len, 1, stdout);
-	printf("\n\n");
-
 	/* See if ftar_load sees our buffer as valid */
 	ar = ftar_load(tar, len);
 	if (!ar) {
@@ -82,7 +80,7 @@ int main(int argc, char *argv[])
 	printf("Magic signature: %s\nNumber of entries: %zu\n", ar->magic,
 	       ar->ent_count);
 	for (i = 0; i < ar->ent_count; i++) {
-		printf("\nEntry %zu\nName: %s\nMode: %zu\nSize: %zu\n"
+		printf("\nEntry %zu\nName: %s\nMode: %o\nSize: %zu\n"
 		       "Modification time: %lu\nChecksum: %zu\n",
 		       i, ar->entries[i]->name, ar->entries[i]->mode,
 		       ar->entries[i]->size, ar->entries[i]->mtime,
