@@ -8,4 +8,10 @@ This list includes the purposes of the headers in this repo
 - `include/write.h` - functions for writing archives
 
 ## Build instructions
-Just do `cmake -S. -Bbuild && cmake --build build` to build the library and command line program.
+To build the repo, enter these commands:
+```sh
+git submodule update --init
+
+cmake -S. -Bbuild
+cmake --build build
+```

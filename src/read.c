@@ -149,12 +149,13 @@ long ftar_checksum(struct ftar_ent *ent)
 	}
 
 	/* Calculate the sum */
+	ret = 0;
 	for (i = 0; i < strlen(ent->name); i++)
-		ret += (unsigned char)ent->name[i];
+		ret += ((unsigned char *)ent->name)[i];
 	ret += (ent->mode + ent->size + ent->mtime);
-	ret += (' ' * 8); /*
+	ret += ' ' * 8; /*
 			   * According to the tar spec, ent->checksum should be
-			   *  treated as spaces for this calculation
+			   *  treated as eight spaces for this calculation
 			   */
 
 	/* Check if we're validating the checksum or just calculating it */
@@ -164,6 +165,39 @@ long ftar_checksum(struct ftar_ent *ent)
 		ent->checksum = ret;
 
 	return ret;
+}
+
+void ftar_print_ent(struct ftar_ent *ent)
+{
+	struct tm *now;
+
+	errno = 0;
+
+	/* Check argument */
+	if (!ent) {
+		errno = EINVAL;
+		return;
+	}
+
+	/* Turn the modification time of the entry into a time structure */
+	now = localtime(&ent->mtime);
+
+	/* Print our entry */
+	printf("Name: %s\nMode: user %o, group %o, others %o\nSize: %zu\n"
+	       "Modification time: %d:%d:%d %d/%d/%d (%lu)\nChecksum: %zu\n",
+	       ent->name, FTAR_GET_MODE_USER(ent->mode),
+	       FTAR_GET_MODE_GROUP(ent->mode), FTAR_GET_MODE_OTHERS(ent->mode),
+	       ent->size, now->tm_hour, now->tm_min, now->tm_sec, now->tm_mday,
+	       now->tm_mon + 1, now->tm_year + 1900, ent->mtime, ent->checksum);
+	printf("File type: %d\nLink name: %s\nFile contents: ", ent->type,
+	       ent->link);
+	fwrite(ent->data, ent->size, 1, stdout);
+
+	/* If necessary, write a newline */
+	if (ent->data[ent->size - 1] != '\n')
+		printf("\n");
+
+	errno = 0;
 }
 
 void ftar_free(struct ftar *tar)

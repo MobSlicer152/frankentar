@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
 #include "frankentar.h"
 #include "util.h"
@@ -62,6 +63,13 @@ extern struct ftar_ent *ftar_find(struct ftar *tar, long *index, const char *nam
  *  returns -1.
  */
 extern long ftar_checksum(struct ftar_ent *ent);
+
+/**
+ * @brief Prints a Frankentar entry
+ * 
+ * @param ent is the entry to print
+ */
+extern void ftar_print_ent(struct ftar_ent *ent);
 
 /**
  * @brief Free a Frankentar structure

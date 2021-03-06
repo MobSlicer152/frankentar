@@ -20,7 +20,33 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
+#include "frankentar.h"
+
+/**
+ * @brief Converts an entry into a buffer
+ * 
+ * @param ent is the entry to convert
+ * @param len_ret returns the length of the returned buffer or -1 (error)
+ * 
+ * @return Returns either `NULL` or a buffer containing the information of the
+ *  entry in a form suitable for writing to a file
+ */
+extern void *ftar_ent_to_raw(struct ftar_ent *ent, size_t *len_ret);
+
+/**
+ * @brief Converts the given Frankentar structure into a buffer
+ * 
+ * @param tar is the structure to convert
+ * @param len_ret returns the length of the buffer or -1 (error)
+ * 
+ * @return Returns `NULL` or the buffer
+ */
+extern void *ftar_to_raw(struct ftar *tar, size_t *len_ret);
 
 #ifdef __cplusplus
 }

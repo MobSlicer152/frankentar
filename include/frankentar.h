@@ -20,6 +20,7 @@
 #ifndef FRANKENTAR_H
 #define FRANKENTAR_H 1
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -42,6 +43,7 @@ extern "C" {
  */
 #define FTAR_BLOCK_SIZE 512
 
+/** File mode macros */
 #define FTAR_MODE_EXEC (1) /** Executable */
 #define FTAR_MODE_WRITE (1 << 1) /** Readable */
 #define FTAR_MODE_READ (1 << 2) /** Writable */
@@ -50,13 +52,13 @@ extern "C" {
 #define FTAR_MODE_FULL \
 	(FTAR_MODE_READ | FTAR_MODE_WRITE | FTAR_MODE_EXEC) /** Full access */
 
-#define FTAR_SET_MODE_USER(mode) ((mode) << 6)
-#define FTAR_SET_MODE_GROUP(mode) ((mode) << 3)
-#define FTAR_SET_MODE_OTHERS(mode) (mode)
+#define FTAR_SET_MODE_USER(mode) (((mode) & 0b111) << 6) /** Set the user mode bit */
+#define FTAR_SET_MODE_GROUP(mode) (((mode) & 0b111) << 3) /** Set the group mode bit */
+#define FTAR_SET_MODE_OTHERS(mode) ((mode) & 0b111) /** Set the bit for everyone */
 
-#define FTAR_GET_MODE_USER(mode) ((mode & 0b111000000) >> 6)
-#define FTAR_GET_MODE_GROUP(mode) ((mode & 0b111000) >> 3)
-#define FTAR_GET_MODE_OTHERS(mode) ((mode & 0b111))
+#define FTAR_GET_MODE_USER(mode) ((mode & 0b111000000) >> 6) /** Get the value of the user mode bit */
+#define FTAR_GET_MODE_GROUP(mode) ((mode & 0b111000) >> 3) /** Get the value of the group mode bit */
+#define FTAR_GET_MODE_OTHERS(mode) ((mode & 0b111)) /** Get the value of the mode bit for everyone */
 
 /**
  * @brief A Frankentar entry (pretty much the same as tar but some fields are
