@@ -3,9 +3,9 @@ Frankentar is a modified version of the tar format, originally created for use i
 
 ## Files
 This list includes the purposes of the headers in this repo
-`include/read.h` - functions for reading archives
-`include/util.h` - general utility functions used by the other functions
-`include/write.h` - functions for writing archives
+- `include/read.h` - functions for reading archives
+- `include/util.h` - general utility functions used by the other functions
+- `include/write.h` - functions for writing archives
 
 ## Build instructions
 Just do `cmake -S. -Bbuild && cmake --build build` to build the library and command line program.
