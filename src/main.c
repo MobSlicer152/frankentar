@@ -88,11 +88,11 @@ int main(int argc, char *argv[])
 
 	/* Print the entry we found */
 	printf("Index of found entry: %zu\nName: %s\nMode: %o\nSize: %zu\n"
-	       "Modification time: %d:%d:%d %d/%d/%d\nChecksum: %zu\n",
+	       "Modification time: %d:%d:%d %d/%d/%d (%lu)\nChecksum: %zu\n",
 	       idx, ar->entries[idx]->name, ar->entries[idx]->mode,
 	       ar->entries[idx]->size, now->tm_hour, now->tm_min,
 	       now->tm_sec, now->tm_mday, now->tm_mon + 1, now->tm_year - 70,
-	       ar->entries[idx]->checksum);
+	       ar->entries[idx]->mtime, ar->entries[idx]->checksum);
 	printf("File type: %d\nLink name: %s\nFile contents: ",
 	       ar->entries[idx]->type, ar->entries[idx]->link);
 	fwrite(ar->entries[idx]->data, ar->entries[idx]->size, 1, stdout);
