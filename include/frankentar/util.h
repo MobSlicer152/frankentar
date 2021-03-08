@@ -29,6 +29,20 @@ extern "C" {
 #include "stb_sprintf.h"
 
 /**
+ * @brief Get the base name of `path`
+ */
+#if _WIN32 && _MSC_VER /*
+			* MSVC is the only (supported) Windows compiler that
+			* uses backslashes in __FILE__
+			*/
+#define FTAR_GET_BASENAME(path) \
+	(strrchr(path, '\\') ? strrchr(path, '\\') + 1 : path)
+#else
+#define FTAR_GET_BASENAME(path) \
+	(strrchr(path, '/') ? strrchr(path, '/') + 1 : path)
+#endif
+
+/**
  * @brief Formats text as `vsprintf` would
  * 
  * @param len_ret will receive the length of the buffer (if it's -1, returns `fmt`)

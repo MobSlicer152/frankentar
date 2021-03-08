@@ -15,6 +15,8 @@
 #define FTAR_OP_CREATE_STR "create"
 #define FTAR_OP_ADD_STR "add"
 #define FTAR_OP_DEL_STR "delete"
+#define FTAR_OP_EXTR_STR "extract"
+#define FTAR_OP_HELP_STR "help"
 
 #define FTAR_OP_READ 0
 #define FTAR_OP_LIST 1
@@ -22,19 +24,22 @@
 #define FTAR_OP_CREATE 3
 #define FTAR_OP_ADD 4
 #define FTAR_OP_DEL 5
+#define FTAR_OP_EXTR 6
+#define FTAR_OP_HELP 7
 
 int main(int argc, char *argv[])
 {
 	/* General variables that are used all over */
 	char op;
 	char *archive;
-	char *path; 
+	char *path;
 	struct ftar *tar;
 	struct ftar_ent *ent;
 
 	/* Check if we got too few args */
 	if (argc < 2)
-		err_exit(EINVAL, "Error: not enough arguments\n");
+		err_exit(EINVAL, "Error: not enough arguments, add \"help\" for"
+				 "more information\n");
 
 	/* Now figure out what mode we're in */
 	if (strcmp(argv[1], FTAR_OP_READ_STR) == 0)
@@ -49,8 +54,15 @@ int main(int argc, char *argv[])
 		op = FTAR_OP_ADD;
 	else if (strcmp(argv[1], FTAR_OP_DEL_STR) == 0)
 		op = FTAR_OP_DEL;
+	else if (strcmp(argv[1], FTAR_OP_EXTR_STR) == 0)
+		op = FTAR_OP_EXTR;
+	else if (strcmp(argv[1], FTAR_OP_HELP_STR) == 0)
+		op = FTAR_OP_HELP;
 	else
-		err_exit(EINVAL, "Error: invalid mode \"%s\" specified\n", argv[1]);
+		err_exit(EINVAL,
+			 "Error: invalid mode \"%s\" specified,"
+			 " specify \"help\" for more\n",
+			 argv[1]);
 
 	/* Now do operation specific stuff */
 	switch (op) {
@@ -58,9 +70,24 @@ int main(int argc, char *argv[])
 		/* First, we need more arguments for this, check that */
 		if (argc < 4)
 			err_exit(EINVAL, "Error: not enough arguments for "
-				 "specified mode\n");
+					 "specified mode\n");
 
 		/*  */
+
+		break;
+	case FTAR_OP_HELP:
+	default:
+		/* Print a help message */
+		printf("Usage: %s <mode> <additional args> ...\n"
+		       "Where \"mode\" is one of the following:\n"
+		       "  read - read the details of a file from the archive\n"
+		       "  list - list the files in the archive\n"
+		       "  find - determine whether a file is in the archive\n"
+		       "  create - create an archive with the givven files\n"
+		       "  add - add a file to the archive, overwriting any"
+		       " file with the same name\n"
+		       "  delete - delete a file from the archive\n",
+		       FTAR_GET_BASENAME(argv[0]));
 
 		break;
 	}
