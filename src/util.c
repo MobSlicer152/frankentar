@@ -73,6 +73,28 @@ char *fmt_text(size_t *len_ret, const char *fmt, ...)
 	return fmt_ptr;
 }
 
+void err_exit(int code, const char *msg, ...)
+{
+	va_list args;
+	char *fmt;
+	size_t len;
+
+	/* Check args */
+	if (!msg)
+		fmt = fmt_text(&len, "Unknown error occured\n");
+
+	/* Format the message */
+	va_start(args, msg);
+	fmt = fmt_text_va(&len, msg, args);
+	va_end(args);
+
+	/* Print it out */
+	fprintf(stderr, "%s", fmt);
+
+	/* Now exit */
+	exit(code);
+}
+
 #ifdef __cplusplus
 }
 #endif

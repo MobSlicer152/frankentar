@@ -51,6 +51,12 @@ struct ftar *ftar_load(void *tar, size_t tar_len)
 		if (ent->size % FTAR_BLOCK_SIZE)
 			addr += FTAR_BLOCK_SIZE;
 	}
+
+	/* Check if there's actually anything there */
+	if (!i) {
+		errno = EINVAL;
+		return NULL;
+	}
 	new->ent_count = i;
 
 	/* Allocate the entries */

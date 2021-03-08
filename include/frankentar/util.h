@@ -20,6 +20,7 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
@@ -60,6 +61,14 @@ extern char *fmt_text_va(size_t *len_ret, const char *fmt, va_list args);
  *  can't be freed in that way.
  */
 extern char *fmt_text(size_t *len_ret, const char *fmt, ...);
+
+/**
+ * @brief Print and error message and exit
+ * 
+ * @param code is the code to exit with
+ * @param msg is the message to print (`printf`-style formatting available)
+ */
+extern void err_exit(int code, const char *msg, ...);
 
 #ifdef __cplusplus
 }
