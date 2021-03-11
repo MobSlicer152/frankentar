@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 		if (!ent)
 			err_exit(errno, "Error: failed to locate file: %s\n",
 				 strerror(errno));
-		
+
 		/* Print the entry */
 		ftar_print_ent(ent);
 
@@ -153,6 +153,24 @@ int main(int argc, char *argv[])
 		ftar_free(tar);
 
 		break;
+	case FTAR_OP_CREATE:
+		size_t nfiles;
+
+		/* Ensure extra arguments present */
+		if (argc < 3)
+			err_exit(EINVAL,
+				 "Error: not enough arguments for "
+				 "specified mode, see \"%s %s %s\"\n",
+				 FTAR_GET_BASENAME(argv[0]), FTAR_OP_CREATE_STR,
+				 FTAR_OP_HELP_STR);
+
+		/* Check if help was asked for */
+		if (strcmp(argv[2], FTAR_OP_HELP_STR) == 0)
+			printf("Frankentar create mode usage: %s %s <archive"
+			       " to create> <one or more files to add>\n",
+			       FTAR_GET_BASENAME(argv[0]), FTAR_OP_CREATE_STR);
+
+		break;
 	case FTAR_OP_HELP:
 	default:
 		/* Print a help message */
@@ -161,13 +179,15 @@ int main(int argc, char *argv[])
 		       "  read - read the details of a file from the archive\n"
 		       "  list - list the files in the archive\n"
 		       "  find - determine whether a file is in the archive\n"
-		       "  create - create an archive with the givven files\n"
+		       "  create - create an archive with the given files\n"
 		       "  add - add a file to the archive, overwriting any"
 		       " file with the same name\n"
 		       "  delete - delete a file from the archive\n"
 		       "  extract - extract all or specified files from the"
 		       " archive\n"
-		       "  help - print this help message\n",
+		       "  help - print this help message\n\n"
+		       "Arguments in angle brackets (<>) are mandatory, while"
+		       " those in square brackets ([]) are optional.\n",
 		       FTAR_GET_BASENAME(argv[0]));
 
 		break;

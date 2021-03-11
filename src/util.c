@@ -73,7 +73,13 @@ char *fmt_text(size_t *len_ret, const char *fmt, ...)
 	return fmt_ptr;
 }
 
-void err_exit(int code, const char *msg, ...)
+void
+#ifdef _MSC_VER
+	__declspec(noreturn)
+#else
+__attribute__((noreturn))
+#endif
+err_exit(int code, const char *msg, ...)
 {
 	va_list args;
 	char *fmt;

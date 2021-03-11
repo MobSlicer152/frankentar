@@ -82,7 +82,13 @@ extern char *fmt_text(size_t *len_ret, const char *fmt, ...);
  * @param code is the code to exit with
  * @param msg is the message to print (`printf`-style formatting available)
  */
-extern void err_exit(int code, const char *msg, ...);
+extern void
+#ifdef _MSC_VER
+__declspec(noreturn)
+#else
+__attribute__((noreturn))
+#endif
+err_exit(int code, const char *msg, ...);
 
 #ifdef __cplusplus
 }
