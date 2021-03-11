@@ -9,10 +9,7 @@
 		"editor.detectIndentation": false,
 		"editor.insertSpaces": false,
 		"files.associations": {
-			"util.h": "c",
-			"stdlib.h": "c",
-			"stb_sprintf.h": "c",
-			"write.h": "c"
+			"*.h": "c"
 		}
 	}
 }

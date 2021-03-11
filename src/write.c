@@ -2,7 +2,7 @@
 
 void *ftar_ent_to_raw(struct ftar_ent *ent, size_t *len_ret)
 {
-	void *buf;
+	char *buf;
 	size_t len;
 
 	errno = 0;
@@ -35,7 +35,7 @@ void *ftar_ent_to_raw(struct ftar_ent *ent, size_t *len_ret)
 
 void *ftar_to_raw(struct ftar *tar, size_t *len_ret)
 {
-	void *buf;
+	char *buf;
 	char *addr;
 	size_t len;
 	size_t i;

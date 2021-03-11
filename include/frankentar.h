@@ -29,7 +29,8 @@ extern "C" {
 #endif
 
 /**
- * @brief Magic value to be put at the start of the file
+ * @brief Magic value to be put at the start of the file (\0 is implied in
+ *  string literal)
  */
 #define FTAR_MAGIC "frankentar"
 

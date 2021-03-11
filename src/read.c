@@ -7,9 +7,9 @@ extern "C" {
 struct ftar *ftar_load(void *tar, size_t tar_len)
 {
 	struct ftar *new;
-	void *addr;
+	char *addr;
 	struct ftar_ent *ent;
-	void *t;
+	char *t;
 	size_t i;
 
 	/* Check our arguments */
@@ -202,6 +202,9 @@ void ftar_print_ent(struct ftar_ent *ent)
 	/* If necessary, write a newline */
 	if (ent->data[ent->size - 1] != '\n')
 		printf("\n");
+
+	/* Free now */
+	free(now);
 
 	errno = 0;
 }
