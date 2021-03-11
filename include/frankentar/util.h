@@ -23,6 +23,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <string.h>
 #include <errno.h>
 
@@ -89,6 +90,16 @@ __declspec(noreturn)
 __attribute__((noreturn))
 #endif
 err_exit(int code, const char *msg, ...);
+
+/**
+ * @brief Get a yes or no response from `stdin`
+ * 
+ * @param message is the question to ask
+ * 
+ * @return Returns `true` or `false` depending on the user's response, or if
+ *  there's an error
+ */
+extern bool get_y_or_n(const char *message, ...);
 
 #ifdef __cplusplus
 }

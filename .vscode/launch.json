@@ -6,9 +6,9 @@
 		"request": "launch",
 		"program": "${workspaceFolder}/build/frankentar",
 		"args": [
-			"read",
-			"test.ftar",
-			"test.txt"
+			"create",
+			"LICENSE.md",
+			"asdf"
 		],
 		"stopAtEntry": false,
 		"cwd": "${workspaceFolder}",

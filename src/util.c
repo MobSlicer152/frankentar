@@ -77,9 +77,9 @@ void
 #ifdef _MSC_VER
 	__declspec(noreturn)
 #else
-__attribute__((noreturn))
+	__attribute__((noreturn))
 #endif
-err_exit(int code, const char *msg, ...)
+		err_exit(int code, const char *msg, ...)
 {
 	va_list args;
 	char *fmt;
@@ -99,6 +99,47 @@ err_exit(int code, const char *msg, ...)
 
 	/* Now exit */
 	exit(code);
+}
+
+bool get_y_or_n(const char *message, ...)
+{
+	bool res;
+	char *resp;
+	char *msg;
+	va_list args;
+	size_t len;
+
+	errno = 0;
+
+	/* Check our argument */
+	if (!message) {
+		errno = EINVAL;
+		return false;
+	}
+
+	/* Format the message */
+	va_start(args, message);
+	msg = fmt_text_va(&len, message, args);
+	va_end(args);
+
+	/* Allocate a buffer for the response */
+	resp = calloc(4, sizeof(char));
+	if (!resp)
+		return false;
+
+	/* Read the response */
+	printf("%s", msg);
+	errno = 0;
+	scanf("%3s", resp);
+	if (errno)
+		return false;
+
+	/* Check the response */
+	res = (*resp == 'y' || *resp == 'Y');
+
+	errno = 0;
+
+	return res;
 }
 
 #ifdef __cplusplus

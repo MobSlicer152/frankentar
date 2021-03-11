@@ -42,7 +42,7 @@ struct ftar *ftar_load(void *tar, size_t tar_len)
 	addr = t + FTAR_MAGIC_LEN;
 	for (i = 0;; i++) {
 		/* Read this header */
-		ent = addr;
+		ent = (struct ftar_ent *)addr;
 		if (!ent->name[0])
 			break;
 

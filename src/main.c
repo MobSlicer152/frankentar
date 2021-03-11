@@ -37,7 +37,9 @@ int main(int argc, char *argv[])
 	struct ftar *tar;
 	struct ftar_ent *ent;
 	FILE *ar;
+	size_t nfiles;
 	size_t len;
+	size_t i;
 
 	/* Check if we got too few args */
 	if (argc < 2)
@@ -154,7 +156,6 @@ int main(int argc, char *argv[])
 
 		break;
 	case FTAR_OP_CREATE:
-		size_t nfiles;
 
 		/* Ensure extra arguments present */
 		if (argc < 3)
@@ -165,10 +166,54 @@ int main(int argc, char *argv[])
 				 FTAR_OP_HELP_STR);
 
 		/* Check if help was asked for */
-		if (strcmp(argv[2], FTAR_OP_HELP_STR) == 0)
+		if (strcmp(argv[2], FTAR_OP_HELP_STR) == 0) {
 			printf("Frankentar create mode usage: %s %s <archive"
 			       " to create> <one or more files to add>\n",
 			       FTAR_GET_BASENAME(argv[0]), FTAR_OP_CREATE_STR);
+			return 0;
+		}
+
+		/* Check for the rest of our arguments */
+		if (argc < 4)
+			err_exit(EINVAL,
+				 "Error: not enough arguments for "
+				 "specified mode, see \"%s %s %s\"\n",
+				 FTAR_GET_BASENAME(argv[0]), FTAR_OP_CREATE_STR,
+				 FTAR_OP_HELP_STR);
+
+		/* Initialize our Frankentar structure */
+		tar = calloc(1, sizeof(struct ftar));
+		if (!tar)
+			err_exit(errno,
+				 "Error: failed to allocate structure: %s\n",
+				 strerror(errno));
+		strncpy(tar->magic, FTAR_MAGIC, FTAR_MAGIC_LEN);
+
+		/* Open the archive */
+		ar = fopen(argv[2], "rb");
+		if (!ar)
+			err_exit(errno, "Error: failed to open file: %s\n",
+				 strerror(errno));
+
+		/* See if we're overwriting something */
+		fseek(ar, 0, SEEK_END);
+		len = ftell(ar);
+		fseek(ar, 0, SEEK_SET);
+		if (len) {
+			if (get_y_or_n("File is not empty. Overwrite it? ")) {
+				printf("Overwriting file.\n");
+				freopen(ar, "wb+", ar);
+			} else {
+				printf("Not overwriting file.\n");
+				fclose(ar);
+				return ECANCELED;
+			}
+
+		}
+
+		/* Iterate through the remaining arguments */
+		for (i = 3; i < argc; i++) {
+		}
 
 		break;
 	case FTAR_OP_HELP:
