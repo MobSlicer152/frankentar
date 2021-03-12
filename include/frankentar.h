@@ -85,6 +85,10 @@ struct ftar_ent {
 	char *data; /**< The file itself (obviously not stored as a pointer) */
 };
 
+/**
+ * @brief A representation of a Frankentar archive.
+ * 
+ */
 struct ftar {
 	char magic[FTAR_MAGIC_LEN]; /**< Magic signature */
 	size_t ent_count; /**< The number of entries found in the archive */

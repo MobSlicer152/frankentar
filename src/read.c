@@ -71,12 +71,12 @@ struct ftar *ftar_load(void *tar, size_t tar_len)
 		       addr + (sizeof(*ent) - sizeof(char *)),
 		       ent->size);
 
-		/* Jump to the next entry */
-		addr += ((ent->size / FTAR_BLOCK_SIZE) + 1) *
-			FTAR_BLOCK_SIZE;
-		if (ent->size % FTAR_BLOCK_SIZE)
-			addr += FTAR_BLOCK_SIZE;
+		/* Jump to the next entry (not the same as tar but it works) */
+		addr += ((sizeof(*ent) - sizeof(char *)) + ent->size);
 	}
+
+	/* Free t */
+	free(t);
 
 	/* Now we're done */
 	return new;
