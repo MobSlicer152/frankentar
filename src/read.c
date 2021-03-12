@@ -183,7 +183,7 @@ void ftar_print_ent(struct ftar_ent *ent)
 	       FTAR_GET_MODE_GROUP(ent->mode), FTAR_GET_MODE_OTHERS(ent->mode),
 	       ent->size, now->tm_hour, now->tm_min, now->tm_sec, now->tm_mday,
 	       now->tm_mon + 1, now->tm_year + 1900, ent->mtime, ent->checksum);
-	printf("File type: %d\nLink name: %s\nFile contents: ", ent->type,
+	printf("File type: %d\nLink name: %s\nFile contents:\n", ent->type,
 	       ent->link);
 	fwrite(ent->data, ent->size, 1, stdout);
 

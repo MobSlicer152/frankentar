@@ -227,39 +227,50 @@ int main(int argc, char *argv[])
 		strncpy(tar->magic, FTAR_MAGIC, FTAR_MAGIC_LEN);
 
 		/* Open the archive */
-		ar = fopen(argv[2], "rb");
-		if (ar) {
-			/* See if we're overwriting something */
-			fseek(ar, 0, SEEK_END);
-			len = ftell(ar);
-			fseek(ar, 0, SEEK_SET);
-			if (len) {
-				if (ftar_get_y_or_n(
-					    "File is not empty. Overwrite it? ")) {
-					printf("Overwriting file.\n");
+		if (strcmp(argv[2], "/dev/stdout") !=
+			    0 && /* Avoid checking when stdout/stderr is our output */
+		    strcmp(argv[2], "/dev/stderr") != 0) {
+			ar = fopen(argv[2], "rb");
+			if (ar) {
+				/* See if we're overwriting something */
+				fseek(ar, 0, SEEK_END);
+				len = ftell(ar);
+				fseek(ar, 0, SEEK_SET);
+				if (len) {
+					if (ftar_get_y_or_n(
+						    "File is not empty. Overwrite it? ")) {
+						printf("Overwriting file.\n");
 
-					/* Close, delete, and re-create the file */
-					fclose(ar);
-					remove(argv[2]);
-					ar = fopen(argv[2], "w+b");
-					if (!ar)
-						ftar_err_exit(
-							errno,
-							"Error: failed to create file: %s\n",
-							strerror(errno));
-				} else {
-					printf("Not overwriting file.\n");
-					fclose(ar);
-					return ECANCELED;
+						/* Close, delete, and re-create the file */
+						fclose(ar);
+						remove(argv[2]);
+						ar = fopen(argv[2], "w+b");
+						if (!ar)
+							ftar_err_exit(
+								errno,
+								"Error: failed to create file: %s\n",
+								strerror(
+									errno));
+					} else {
+						printf("Not overwriting file.\n");
+						fclose(ar);
+						return ECANCELED;
+					}
 				}
+			} else {
+				ar = fopen(argv[2], "w+b");
+				if (!ar)
+					ftar_err_exit(
+						errno,
+						"Error: failed to create file: %s\n",
+						strerror(errno));
 			}
 		} else {
-			ar = fopen(argv[2], "w+b");
-			if (!ar)
-				ftar_err_exit(
-					errno,
-					"Error: failed to create file: %s\n",
-					strerror(errno));
+			if (strcmp(argv[2], "/dev/stdout") == 0)
+				ar = stdout;
+
+			if (strcmp(argv[2], "/dev/stderr") == 0)
+				ar = stderr;
 		}
 
 		/* Iterate through the remaining arguments */
