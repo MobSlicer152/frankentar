@@ -7,8 +7,8 @@ extern "C" {
 struct ftar *ftar_load(void *tar, size_t tar_len)
 {
 	struct ftar *new;
-	char *addr;
 	struct ftar_ent *ent;
+	char *addr;
 	char *t;
 	size_t i;
 
@@ -38,26 +38,13 @@ struct ftar *ftar_load(void *tar, size_t tar_len)
 		}
 	}
 
-	/* Count the entries */
+	/* Get the number of entries */
 	addr = t + FTAR_MAGIC_LEN;
-	for (i = 0;; i++) {
-		/* Read this header */
-		ent = (struct ftar_ent *)addr;
-		if (!ent->name[0])
-			break;
-
-		/* Get the address of the next entry */
-		addr += ((ent->size / FTAR_BLOCK_SIZE) + 1) * FTAR_BLOCK_SIZE;
-		if (ent->size % FTAR_BLOCK_SIZE)
-			addr += FTAR_BLOCK_SIZE;
-	}
-
-	/* Check if there's actually anything there */
-	if (!i) {
+	memcpy(&new->ent_count, addr, sizeof(size_t));
+	if (!new->ent_count) {
 		errno = EINVAL;
 		return NULL;
 	}
-	new->ent_count = i;
 
 	/* Allocate the entries */
 	new->entries = calloc(new->ent_count, sizeof(struct ftar_ent *));
@@ -65,28 +52,29 @@ struct ftar *ftar_load(void *tar, size_t tar_len)
 		return NULL;
 
 	/* Read each entry into its structure (yay pointer arithmetic!) */
-	addr = t + FTAR_MAGIC_LEN;
+	addr += sizeof(size_t);
 	for (i = 0; i < new->ent_count; i++) {
 		/* Read this header */
 		new->entries[i] = calloc(1, sizeof(struct ftar_ent));
 		if (!new->entries[i])
 			return NULL;
-		memcpy(new->entries[i]->name, addr,
+		ent = new->entries[i];
+		memcpy(ent->name, addr,
 		       (sizeof(*new->entries[i]) - sizeof(char *)));
 
 		/* Read the file for this entry */
-		new->entries[i]->data =
-			calloc(new->entries[i]->size, sizeof(char));
-		if (!new->entries[i]->data)
+		ent->data =
+			calloc(ent->size, sizeof(char));
+		if (!ent->data)
 			return NULL;
-		memcpy(new->entries[i]->data,
-		       addr + (sizeof(*new->entries[i]) - sizeof(char *)),
-		       new->entries[i]->size);
+		memcpy(ent->data,
+		       addr + (sizeof(*ent) - sizeof(char *)),
+		       ent->size);
 
 		/* Jump to the next entry */
-		addr += ((new->entries[i]->size / FTAR_BLOCK_SIZE) + 1) *
+		addr += ((ent->size / FTAR_BLOCK_SIZE) + 1) *
 			FTAR_BLOCK_SIZE;
-		if (new->entries[i]->size % FTAR_BLOCK_SIZE)
+		if (ent->size % FTAR_BLOCK_SIZE)
 			addr += FTAR_BLOCK_SIZE;
 	}
 
@@ -112,7 +100,7 @@ struct ftar_ent *ftar_find(struct ftar *tar, long *index, const char *name, ...)
 
 	/* Format name */
 	va_start(args, name);
-	name_fmt = fmt_text_va(&name_len, name, args);
+	name_fmt = ftar_fmt_text_va(&name_len, name, args);
 	va_end(args);
 
 	/* Loop through entries */
@@ -202,9 +190,6 @@ void ftar_print_ent(struct ftar_ent *ent)
 	/* If necessary, write a newline */
 	if (ent->data[ent->size - 1] != '\n')
 		printf("\n");
-
-	/* Free now */
-	free(now);
 
 	errno = 0;
 }

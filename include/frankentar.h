@@ -44,6 +44,14 @@ extern "C" {
  */
 #define FTAR_BLOCK_SIZE 512
 
+/** File type macros */
+#define FTAR_FTYPE_REG 0
+#define FTAR_FTYPE_LINK 1
+#define FTAR_FTYPE_SYMLINK 2
+#define FTAR_FTYPE_SPECIAL 3
+#define FTAR_FTYPE_DIR 4
+#define FTAR_FTYPE_FIFO 5
+
 /** File mode macros */
 #define FTAR_MODE_EXEC (1) /** Executable */
 #define FTAR_MODE_WRITE (1 << 1) /** Readable */

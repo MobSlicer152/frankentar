@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-char *fmt_text_va(size_t *len_ret, const char *fmt, va_list args)
+char *ftar_fmt_text_va(size_t *len_ret, const char *fmt, va_list args)
 {
 	size_t len;
 	char *buf;
@@ -51,7 +51,7 @@ char *fmt_text_va(size_t *len_ret, const char *fmt, va_list args)
 	return buf;
 }
 
-char *fmt_text(size_t *len_ret, const char *fmt, ...)
+char *ftar_fmt_text(size_t *len_ret, const char *fmt, ...)
 {
 	va_list args;
 	char *fmt_ptr;
@@ -65,7 +65,7 @@ char *fmt_text(size_t *len_ret, const char *fmt, ...)
 	}
 
 	va_start(args, fmt);
-	fmt_ptr = fmt_text_va(len_ret, fmt, args);
+	fmt_ptr = ftar_fmt_text_va(len_ret, fmt, args);
 	va_end(args);
 
 	errno = 0;
@@ -79,7 +79,7 @@ void
 #else
 	__attribute__((noreturn))
 #endif
-		err_exit(int code, const char *msg, ...)
+		ftar_err_exit(int code, const char *msg, ...)
 {
 	va_list args;
 	char *fmt;
@@ -87,11 +87,11 @@ void
 
 	/* Check args */
 	if (!msg)
-		fmt = fmt_text(&len, "Unknown error occured\n");
+		fmt = ftar_fmt_text(&len, "Unknown error occured\n");
 
 	/* Format the message */
 	va_start(args, msg);
-	fmt = fmt_text_va(&len, msg, args);
+	fmt = ftar_fmt_text_va(&len, msg, args);
 	va_end(args);
 
 	/* Print it out */
@@ -101,7 +101,7 @@ void
 	exit(code);
 }
 
-bool get_y_or_n(const char *message, ...)
+bool ftar_get_y_or_n(const char *message, ...)
 {
 	bool res;
 	char *resp;
@@ -119,7 +119,7 @@ bool get_y_or_n(const char *message, ...)
 
 	/* Format the message */
 	va_start(args, message);
-	msg = fmt_text_va(&len, message, args);
+	msg = ftar_fmt_text_va(&len, message, args);
 	va_end(args);
 
 	/* Allocate a buffer for the response */

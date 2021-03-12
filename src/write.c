@@ -65,6 +65,8 @@ void *ftar_to_raw(struct ftar *tar, size_t *len_ret)
 	/* Copy in the signature and the entries */
 	strncpy(buf, FTAR_MAGIC, FTAR_MAGIC_LEN);
 	addr = buf + FTAR_MAGIC_LEN;
+	memcpy(addr, &tar->ent_count, sizeof(size_t));
+	addr += sizeof(size_t);
 	for (i = 0; i < tar->ent_count; i++) {
 		/* Check the entry's validity */
 		if (!tar->entries[i]) {
@@ -89,5 +91,6 @@ void *ftar_to_raw(struct ftar *tar, size_t *len_ret)
 	errno = 0;
 
 	/* Return the buffer */
+	*len_ret = len;
 	return buf;
 }

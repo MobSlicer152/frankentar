@@ -30,7 +30,7 @@ extern "C" {
 #include "stb_sprintf.h"
 
 /**
- * @brief Get the base name of `path`
+ * @brief Get the base name of `path` (entirely stolen from Stack Overflow)
  */
 #if _WIN32 && _MSC_VER /*
 			* MSVC is the only (supported) Windows compiler that
@@ -59,7 +59,7 @@ extern "C" {
  *  large value that should be good enough as a fallback.  Always `free` the buffer,
  *  unless len_ret is -1 and `fmt` can't be freed in that way.
  */
-extern char *fmt_text_va(size_t *len_ret, const char *fmt, va_list args);
+extern char *ftar_fmt_text_va(size_t *len_ret, const char *fmt, va_list args);
 
 /**
  * @brief Formats text as `sprintf` would
@@ -75,7 +75,7 @@ extern char *fmt_text_va(size_t *len_ret, const char *fmt, va_list args);
  *  `sprintf`. Always `free` the buffer, unless len_ret is -1 and `fmt`
  *  can't be freed in that way.
  */
-extern char *fmt_text(size_t *len_ret, const char *fmt, ...);
+extern char *ftar_fmt_text(size_t *len_ret, const char *fmt, ...);
 
 /**
  * @brief Print and error message and exit
@@ -89,7 +89,7 @@ __declspec(noreturn)
 #else
 __attribute__((noreturn))
 #endif
-err_exit(int code, const char *msg, ...);
+ftar_err_exit(int code, const char *msg, ...);
 
 /**
  * @brief Get a yes or no response from `stdin`
@@ -99,7 +99,7 @@ err_exit(int code, const char *msg, ...);
  * @return Returns `true` or `false` depending on the user's response, or if
  *  there's an error
  */
-extern bool get_y_or_n(const char *message, ...);
+extern bool ftar_get_y_or_n(const char *message, ...);
 
 #ifdef __cplusplus
 }
